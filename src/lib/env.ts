@@ -33,4 +33,20 @@ const envSchema = z.object({
   SYNC_VEICULOS_CRON: z.string().default("0 */6 * * *"),
 });
 
-export const env = envSchema.parse(process.env);
+export type Env = z.infer<typeof envSchema>;
+
+let _env: Env | undefined;
+
+export function getEnv(): Env {
+  if (!_env) {
+    _env = envSchema.parse(process.env);
+  }
+  return _env;
+}
+
+// For backward compatibility
+export const env = new Proxy({} as Env, {
+  get(_, prop: string) {
+    return getEnv()[prop as keyof Env];
+  },
+});

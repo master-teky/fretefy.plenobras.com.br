@@ -71,11 +71,19 @@ class FretefyClient {
   private apiKey: string;
 
   constructor() {
-    this.baseUrl = env.FRETEFY_API_URL;
-    this.apiKey = env.FRETEFY_API_KEY;
+    this.baseUrl = "";
+    this.apiKey = "";
+  }
+
+  private init() {
+    if (!this.baseUrl) {
+      this.baseUrl = env.FRETEFY_API_URL;
+      this.apiKey = env.FRETEFY_API_KEY;
+    }
   }
 
   private async request<T>(path: string, options?: RequestInit): Promise<T> {
+    this.init();
     const url = `${this.baseUrl}${path}`;
     const response = await fetch(url, {
       ...options,
