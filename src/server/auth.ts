@@ -7,7 +7,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       name: "ERP Login",
       credentials: {
         username: { label: "Email", type: "text" },
-        password: { label: "Senha", type: "password" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;

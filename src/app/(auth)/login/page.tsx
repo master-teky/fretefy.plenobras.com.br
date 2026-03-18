@@ -25,9 +25,9 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Credenciais invalidas");
+      setError("Invalid credentials");
     } else {
-      router.push("/motoristas");
+      router.push("/drivers");
     }
   }
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
         <input
           name="password"
           type="password"
-          placeholder="Senha"
+          placeholder="Password"
           required
           className="w-full rounded border p-2"
         />
@@ -55,7 +55,7 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full rounded bg-black p-2 text-white disabled:opacity-50"
         >
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
     </div>

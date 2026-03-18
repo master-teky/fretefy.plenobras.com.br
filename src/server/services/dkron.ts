@@ -23,22 +23,22 @@ async function upsertJob(job: DkronJob): Promise<void> {
 export async function registerDkronJobs(): Promise<void> {
   const jobs: DkronJob[] = [
     {
-      name: "sync-motoristas",
+      name: "sync-drivers",
       schedule: env.SYNC_MOTORISTAS_CRON,
       executor: "http",
       executor_config: {
         method: "POST",
-        url: `${env.APP_BASE_URL}/api/cron/sync-motoristas`,
+        url: `${env.APP_BASE_URL}/api/cron/sync-drivers`,
         headers: JSON.stringify({ "X-Cron-Secret": env.CRON_SECRET }),
       },
     },
     {
-      name: "sync-veiculos",
+      name: "sync-vehicles",
       schedule: env.SYNC_VEICULOS_CRON,
       executor: "http",
       executor_config: {
         method: "POST",
-        url: `${env.APP_BASE_URL}/api/cron/sync-veiculos`,
+        url: `${env.APP_BASE_URL}/api/cron/sync-vehicles`,
         headers: JSON.stringify({ "X-Cron-Secret": env.CRON_SECRET }),
       },
     },

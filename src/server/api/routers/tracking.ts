@@ -6,22 +6,22 @@ export const trackingRouter = createTRPCRouter({
   list: protectedProcedure
     .input(
       z.object({
-        situacao: z.number().optional(),
-        dhInicio: z.string().optional(),
-        dhFim: z.string().optional(),
+        status: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       }).optional()
     )
     .query(async ({ input }) => {
-      return fretefy.listCargas({
-        situacao: input?.situacao,
-        dhReferenciaInicio: input?.dhInicio,
-        dhReferenciaFim: input?.dhFim,
+      return fretefy.listShipments({
+        situacao: input?.status,
+        dhReferenciaInicio: input?.startDate,
+        dhReferenciaFim: input?.endDate,
       });
     }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
-      return fretefy.getCarga(input.id);
+      return fretefy.getShipment(input.id);
     }),
 });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { syncVeiculos } from "@/server/services/sync-veiculos";
+import { syncVehicles } from "@/server/services/sync-vehicles";
 
 export async function POST(request: NextRequest) {
   const secret = request.headers.get("X-Cron-Secret");
@@ -10,10 +10,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await syncVeiculos();
+    const result = await syncVehicles();
     return NextResponse.json(result);
   } catch (error) {
-    console.error("[cron] sync-veiculos failed:", error);
+    console.error("[cron] sync-vehicles failed:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Internal error" },
       { status: 500 }

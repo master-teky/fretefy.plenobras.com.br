@@ -1,10 +1,10 @@
 import { drizzle } from "drizzle-orm/node-mssql";
 import * as sql from "mssql";
-import * as motorista from "./schema/motorista";
-import * as veiculo from "./schema/veiculo";
+import * as driver from "./schema/driver";
+import * as vehicle from "./schema/vehicle";
 
 type DrizzleDb = ReturnType<typeof drizzle<typeof schema>>;
-const schema = { ...motorista, ...veiculo };
+const schema = { ...driver, ...vehicle };
 
 let _db: DrizzleDb | undefined;
 

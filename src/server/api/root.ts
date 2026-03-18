@@ -1,12 +1,12 @@
 import { createTRPCRouter } from "./trpc";
 import { trackingRouter } from "./routers/tracking";
-import { motoristaRouter } from "./routers/motorista";
-import { veiculoRouter } from "./routers/veiculo";
+import { driverRouter } from "./routers/driver";
+import { vehicleRouter } from "./routers/vehicle";
 
 export const appRouter = createTRPCRouter({
   tracking: trackingRouter,
-  motorista: motoristaRouter,
-  veiculo: veiculoRouter,
+  driver: driverRouter,
+  vehicle: vehicleRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -2,7 +2,7 @@ import { env } from "@/lib/env";
 
 // --- Types ---
 
-export interface FretefyMotorista {
+export interface FretefyDriver {
   id: string;
   nome: string;
   documento: string;
@@ -12,14 +12,14 @@ export interface FretefyMotorista {
   dataNascimento?: string;
 }
 
-export interface FretefyMotoristaInput {
+export interface FretefyDriverInput {
   nome: string;
   documento: string;
   numeroCNH: string;
   celular: string;
 }
 
-export interface FretefyVeiculo {
+export interface FretefyVehicle {
   id: string;
   placa: string;
   rNTRC: string;
@@ -29,22 +29,22 @@ export interface FretefyVeiculo {
   propriedade?: string;
 }
 
-export interface FretefyVeiculoInput {
+export interface FretefyVehicleInput {
   placa: string;
   rNTRC: string;
   tipoVeiculoId: string;
   tipoCarroceriaId: string;
 }
 
-export interface FretefyCarga {
+export interface FretefyShipment {
   id: string;
   situacao: number;
-  eventos: FretefyCargaEvento[];
-  motorista?: FretefyMotorista;
-  veiculo?: FretefyVeiculo;
+  eventos: FretefyShipmentEvent[];
+  motorista?: FretefyDriver;
+  veiculo?: FretefyVehicle;
 }
 
-export interface FretefyCargaEvento {
+export interface FretefyShipmentEvent {
   tipo: string;
   dhEvento: string;
   descricao: string;
@@ -55,10 +55,10 @@ export interface FretefyTrackingItem {
   situacao: number;
   dhColeta?: string;
   dhEntrega?: string;
-  eventos: FretefyCargaEvento[];
+  eventos: FretefyShipmentEvent[];
 }
 
-export interface FretefyTipo {
+export interface FretefyType {
   id: string;
   descricao: string;
   tipo: number;
@@ -103,46 +103,46 @@ class FretefyClient {
     return response.json() as Promise<T>;
   }
 
-  // Motorista
-  async getMotorista(documento: string): Promise<FretefyMotorista> {
-    return this.request<FretefyMotorista>(`/motorista/${documento}`);
+  // Driver
+  async getDriver(documento: string): Promise<FretefyDriver> {
+    return this.request<FretefyDriver>(`/motorista/${documento}`);
   }
 
-  async createMotorista(data: FretefyMotoristaInput): Promise<FretefyMotorista> {
-    return this.request<FretefyMotorista>("/motorista", {
+  async createDriver(data: FretefyDriverInput): Promise<FretefyDriver> {
+    return this.request<FretefyDriver>("/motorista", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  // Veiculo
-  async getVeiculo(placa: string): Promise<FretefyVeiculo> {
-    return this.request<FretefyVeiculo>(`/veiculo/${placa}`);
+  // Vehicle
+  async getVehicle(placa: string): Promise<FretefyVehicle> {
+    return this.request<FretefyVehicle>(`/veiculo/${placa}`);
   }
 
-  async createVeiculo(data: FretefyVeiculoInput): Promise<FretefyVeiculo> {
-    return this.request<FretefyVeiculo>("/veiculo", {
+  async createVehicle(data: FretefyVehicleInput): Promise<FretefyVehicle> {
+    return this.request<FretefyVehicle>("/veiculo", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  // Carga / Tracking
-  async getCarga(id: string): Promise<FretefyCarga> {
-    return this.request<FretefyCarga>(`/carga/${id}`);
+  // Shipment / Tracking
+  async getShipment(id: string): Promise<FretefyShipment> {
+    return this.request<FretefyShipment>(`/carga/${id}`);
   }
 
-  async listCargas(params?: {
+  async listShipments(params?: {
     situacao?: number;
     dhReferenciaInicio?: string;
     dhReferenciaFim?: string;
-  }): Promise<FretefyCarga[]> {
+  }): Promise<FretefyShipment[]> {
     const searchParams = new URLSearchParams();
     if (params?.situacao !== undefined) searchParams.set("situacao", String(params.situacao));
     if (params?.dhReferenciaInicio) searchParams.set("dhReferenciaInicio", params.dhReferenciaInicio);
     if (params?.dhReferenciaFim) searchParams.set("dhReferenciaFim", params.dhReferenciaFim);
     const qs = searchParams.toString();
-    return this.request<FretefyCarga[]>(`/carga${qs ? `?${qs}` : ""}`);
+    return this.request<FretefyShipment[]>(`/carga${qs ? `?${qs}` : ""}`);
   }
 
   async getTracking(params?: {
@@ -158,9 +158,9 @@ class FretefyClient {
     return this.request<FretefyTrackingItem[]>(`/tracking${qs ? `?${qs}` : ""}`);
   }
 
-  // Tipos
-  async getTipos(tipo: number): Promise<FretefyTipo[]> {
-    return this.request<FretefyTipo[]>(`/tipos/${tipo}`);
+  // Types
+  async getTypes(tipo: number): Promise<FretefyType[]> {
+    return this.request<FretefyType[]>(`/tipos/${tipo}`);
   }
 }
 
