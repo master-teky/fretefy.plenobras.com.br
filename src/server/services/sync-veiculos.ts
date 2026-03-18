@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
 import { mdfeVeiculos } from "@/server/db/schema/veiculo";
+import { eq } from "drizzle-orm";
 import { fretefy } from "./fretefy-client";
 
 interface SyncResult {
@@ -9,7 +10,11 @@ interface SyncResult {
 }
 
 export async function syncVeiculos(): Promise<SyncResult> {
-  const veiculos = await db.select().from(mdfeVeiculos);
+  const veiculos = await db
+    .select()
+    .from(mdfeVeiculos)
+    .where(eq(mdfeVeiculos.ativo, true));
+
   let synced = 0;
   let errors = 0;
 
@@ -18,7 +23,7 @@ export async function syncVeiculos(): Promise<SyncResult> {
       await fretefy.createVeiculo({
         placa: veiculo.placa,
         rNTRC: veiculo.rntrc ?? "",
-        tipoVeiculoId: veiculo.tipoVeiculo ?? "",
+        tipoVeiculoId: veiculo.tipoUnidadeTransporte.toString(),
         tipoCarroceriaId: veiculo.tipoCarroceria ?? "",
       });
       synced++;

@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
 import { mdfeMotoristas } from "@/server/db/schema/motorista";
+import { eq } from "drizzle-orm";
 import { fretefy } from "./fretefy-client";
 
 interface SyncResult {
@@ -9,7 +10,11 @@ interface SyncResult {
 }
 
 export async function syncMotoristas(): Promise<SyncResult> {
-  const motoristas = await db.select().from(mdfeMotoristas);
+  const motoristas = await db
+    .select()
+    .from(mdfeMotoristas)
+    .where(eq(mdfeMotoristas.ativo, true));
+
   let synced = 0;
   let errors = 0;
 
@@ -17,9 +22,9 @@ export async function syncMotoristas(): Promise<SyncResult> {
     try {
       await fretefy.createMotorista({
         nome: motorista.nome,
-        documento: motorista.documento,
-        numeroCNH: motorista.numeroCNH ?? "",
-        celular: motorista.celular ?? "",
+        documento: motorista.cpf,
+        numeroCNH: motorista.numeroRegistro,
+        celular: "",
       });
       synced++;
     } catch (error) {
@@ -28,7 +33,7 @@ export async function syncMotoristas(): Promise<SyncResult> {
         JSON.stringify({
           level: "error",
           context: "sync-motoristas",
-          documento: motorista.documento,
+          cpf: motorista.cpf,
           error: error instanceof Error ? error.message : String(error),
         })
       );
