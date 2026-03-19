@@ -1,4 +1,7 @@
-import { env } from "@/lib/env";
+import { env } from "@/lib/PbEnvLib";
+import { createLogger } from "@/lib/PbLoggerLib";
+
+const log = createLogger("dkron");
 
 interface DkronJob {
   name: string;
@@ -47,21 +50,11 @@ export async function registerDkronJobs(): Promise<void> {
   for (const job of jobs) {
     try {
       await upsertJob(job);
-      console.log(
-        JSON.stringify({
-          level: "info",
-          context: "dkron",
-          message: `Job registered: ${job.name}`,
-        })
-      );
+      log.info({ job: job.name }, "Job registrado com sucesso");
     } catch (error) {
-      console.warn(
-        JSON.stringify({
-          level: "warn",
-          context: "dkron",
-          message: `Failed to register job: ${job.name}`,
-          error: error instanceof Error ? error.message : String(error),
-        })
+      log.warn(
+        { job: job.name, error: error instanceof Error ? error.message : String(error) },
+        "Falha ao registrar job"
       );
     }
   }

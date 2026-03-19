@@ -10,7 +10,7 @@ let _db: DrizzleDb | undefined;
 
 export function getDb(): DrizzleDb {
   if (!_db) {
-    const { env } = require("@/lib/env") as { env: import("@/lib/env").Env };
+    const { env } = require("@/lib/PbEnvLib") as { env: import("@/lib/PbEnvLib").Env };
     const pool = new sql.ConnectionPool({
       server: env.ERP_DB_HOST,
       port: Number(env.ERP_DB_PORT),

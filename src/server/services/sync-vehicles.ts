@@ -2,6 +2,9 @@ import { db } from "@/server/db";
 import { mdfeVehicles } from "@/server/db/schema/vehicle";
 import { eq } from "drizzle-orm";
 import { fretefy } from "./fretefy-client";
+import { createLogger } from "@/lib/PbLoggerLib";
+
+const log = createLogger("sync-vehicles");
 
 interface SyncResult {
   total: number;
@@ -29,18 +32,14 @@ export async function syncVehicles(): Promise<SyncResult> {
       synced++;
     } catch (error) {
       errors++;
-      console.error(
-        JSON.stringify({
-          level: "error",
-          context: "sync-vehicles",
-          placa: vehicle.plate,
-          error: error instanceof Error ? error.message : String(error),
-        })
+      log.error(
+        { placa: vehicle.plate, error: error instanceof Error ? error.message : String(error) },
+        "Erro ao sincronizar veículo"
       );
     }
   }
 
   const result: SyncResult = { total: vehicles.length, synced, errors };
-  console.log(JSON.stringify({ level: "info", context: "sync-vehicles", ...result }));
+  log.info(result, "Sincronização de veículos concluída");
   return result;
 }

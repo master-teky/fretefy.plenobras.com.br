@@ -6,14 +6,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       name: "ERP Login",
       credentials: {
-        username: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        username: { label: "E-mail", type: "text" },
+        password: { label: "Senha", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
 
         // Lazy import to avoid env parse errors at middleware/build time
-        const { env } = await import("@/lib/env");
+        const { env } = await import("@/lib/PbEnvLib");
 
         const params = new URLSearchParams();
         params.append("grant_type", "password");

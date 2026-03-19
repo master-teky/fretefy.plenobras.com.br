@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { fretefy } from "@/server/services/fretefy-client";
 
-export const trackingRouter = createTRPCRouter({
+export const PbTrackingRouter = createTRPCRouter({
   list: protectedProcedure
     .input(
       z.object({

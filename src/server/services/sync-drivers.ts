@@ -2,6 +2,9 @@ import { db } from "@/server/db";
 import { mdfeDrivers } from "@/server/db/schema/driver";
 import { eq } from "drizzle-orm";
 import { fretefy } from "./fretefy-client";
+import { createLogger } from "@/lib/PbLoggerLib";
+
+const log = createLogger("sync-drivers");
 
 interface SyncResult {
   total: number;
@@ -29,18 +32,14 @@ export async function syncDrivers(): Promise<SyncResult> {
       synced++;
     } catch (error) {
       errors++;
-      console.error(
-        JSON.stringify({
-          level: "error",
-          context: "sync-drivers",
-          cpf: driver.taxId,
-          error: error instanceof Error ? error.message : String(error),
-        })
+      log.error(
+        { cpf: driver.taxId, error: error instanceof Error ? error.message : String(error) },
+        "Erro ao sincronizar motorista"
       );
     }
   }
 
   const result: SyncResult = { total: drivers.length, synced, errors };
-  console.log(JSON.stringify({ level: "info", context: "sync-drivers", ...result }));
+  log.info(result, "Sincronização de motoristas concluída");
   return result;
 }

@@ -9,8 +9,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Fretefy - Plenobras",
-  description: "Freight Management Platform",
+  title: { template: "%s - Plenobras", default: "Plenobras" },
+  description: "Plataforma de Gestão de Fretes - Plenobras",
   icons: {
     icon: "/assets/images/favicon/favicon-32x32.png",
     apple: "/assets/images/favicon/apple-touch-icon.png",
@@ -22,12 +22,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html
-      lang="en"
-      className={`${plusJakartaSans.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+  return <html
+    lang="pt-BR"
+    className={`${plusJakartaSans.variable} h-full antialiased`}
+  >
+    <body className="min-h-full flex flex-col">{children}</body>
+  </html>
 }
