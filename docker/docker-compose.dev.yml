@@ -1,0 +1,39 @@
+services:
+  dkron:
+    image: dkron/dkron:light
+    restart: always
+    environment:
+      - TZ=America/Sao_Paulo
+    command: agent --server --bootstrap-expect=1
+    ports:
+      - "9090:8080"
+    volumes:
+      - ../dkron_data:/var/lib/dkron
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/v1/ 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  mssql:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    restart: always
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=AppDb@Dev2024!
+      - TZ=America/Sao_Paulo
+    ports:
+      - "1436:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'AppDb@Dev2024!' -Q 'SELECT 1' -b -o /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  mssql_data:

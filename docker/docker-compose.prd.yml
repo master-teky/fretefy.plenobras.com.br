@@ -1,0 +1,38 @@
+services:
+  fretefy_plenobras_com_br:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: always
+    container_name: fretefy_plenobras_com_br
+    env_file:
+      - ../.env.prd
+    ports:
+      - "3005:3000"
+    volumes:
+      - ../logs:/app/logs
+#    depends_on:
+#      - dkron
+    networks:
+      - fretefy-network
+
+#  dkron:
+#    image: dkron/dkron:light
+#    restart: always
+#    environment:
+#      - TZ=America/Sao_Paulo
+#    command: agent --server --bootstrap-expect=1
+#    volumes:
+#      - ../dkron_data:/var/lib/dkron
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/v1/ 2>/dev/null || exit 1"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 10s
+#    networks:
+#      - fretefy-network
+
+networks:
+  fretefy-network:
+    driver: bridge

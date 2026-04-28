@@ -2,7 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import {FormEvent, useState} from "react";
 import Image from "next/image";
 import androidChrome192 from "../../../../public/assets/images/favicon/android-chrome-192-192.png";
 import androidChrome72 from "../../../../public/assets/images/favicon/android-chrome-72-72.png";
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -86,7 +86,7 @@ export default function LoginPage() {
               htmlFor="username"
               className="block text-sm font-medium text-gray-700 mb-1.5"
             >
-              E-mail
+              Username
             </label>
             <input
               id="username"
@@ -94,7 +94,7 @@ export default function LoginPage() {
               type="text"
               required
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-[#003062] focus:outline-none focus:ring-2 focus:ring-[#003062]/20"
-              placeholder="your@email.com"
+              placeholder="Informe seu usuário"
             />
           </div>
           <div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
               type="password"
               required
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-[#003062] focus:outline-none focus:ring-2 focus:ring-[#003062]/20"
-              placeholder="Digite sua senha"
+              placeholder="Informe sua senha"
             />
           </div>
         </div>

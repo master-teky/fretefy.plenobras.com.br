@@ -1,7 +1,11 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { createLogger } from "@/lib/PbLoggerLib";
+
+const log = createLogger("auth");
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   providers: [
     Credentials({
       name: "ERP Login",
@@ -43,7 +47,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: credentials.username as string,
             accessToken: data.access_token,
           };
-        } catch {
+        } catch(e) {
+          log.error({ error: e }, "Falha na autenticação");
           return null;
         }
       },

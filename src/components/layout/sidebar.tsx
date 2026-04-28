@@ -6,7 +6,7 @@ import Image from "next/image";
 import { signOut } from "next-auth/react";
 import {
   Truck,
-  Car,
+  User,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -16,8 +16,8 @@ import androidChrome72 from "../../../public/assets/images/favicon/android-chrom
 import logoPlenobras from "../../../public/assets/images/logo-loja-plenobras-colored.svg";
 
 const navItems = [
-  { href: "/drivers", label: "Motoristas", icon: Truck },
-  { href: "/vehicles", label: "Veículos", icon: Car },
+  { href: "/drivers", label: "Motoristas", icon: User },
+  { href: "/vehicles", label: "Veículos", icon: Truck },
 ];
 
 export function Sidebar() {

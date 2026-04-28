@@ -1,35 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/lib/PbEnvLib";
-import { createLogger } from "@/lib/PbLoggerLib";
+"use server"
 
-const log = createLogger("webhook");
+import { NextRequest, NextResponse } from "next/server"
+import { env } from "@/lib/PbEnvLib"
+import { createLogger } from "@/lib/PbLoggerLib"
+import { fretefyWebhookPayloadSchema } from "@/types/PbFretefyWebhookType"
+import { processWebhookEvent } from "@/server/services/PbWebhookService"
 
-interface FretefyWebhookPayload {
-  id: string;
-  timestamp: string;
-  type: string;
-  data: Record<string, unknown>;
-}
+const log = createLogger("webhook")
 
 export async function POST(request: NextRequest) {
-  const secret = request.headers.get("X-Webhook-Secret");
+  const authorization = request.headers.get("Authorization")
+  const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null
 
-  if (secret !== env.WEBHOOK_SECRET) {
-    log.error("Segredo do webhook inválido recebido");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const raw = await request.json()
+
+  log.info({ raw }, "Payload do webhook inválido")
+
+  if (token !== env.WEBHOOK_SECRET) {
+    log.error("Segredo do webhook inválido recebido")
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    const payload = (await request.json()) as FretefyWebhookPayload;
+
+    const parsed = fretefyWebhookPayloadSchema.safeParse(raw)
+
+    if (!parsed.success) {
+      log.warn({ errors: parsed.error.issues, raw }, "Payload do webhook inválido")
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+    }
+
+    const payload = parsed.data
 
     log.info(
-      { eventType: payload.type, eventId: payload.id, timestamp: payload.timestamp, data: payload.data },
-      "Evento de webhook recebido"
-    );
+      { eventType: payload.type, eventId: payload.id, timestamp: payload.timestamp },
+      "Evento de webhook recebido",
+    )
 
-    return NextResponse.json({ received: true });
+    await processWebhookEvent(payload)
+
+    return NextResponse.json({ received: true })
   } catch (error) {
-    log.error({ error }, "Falha ao processar payload do webhook");
-    return NextResponse.json({ error: "Bad request" }, { status: 400 });
+    log.error({ error }, "Falha ao processar payload do webhook")
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
