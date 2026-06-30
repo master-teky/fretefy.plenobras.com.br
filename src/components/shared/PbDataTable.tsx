@@ -22,6 +22,14 @@ export interface PbColumnDef<T> {
   className?: string
 }
 
+export interface ServerPagination {
+  page: number
+  pageSize: number
+  total: number
+  onPageChange: (page: number) => void
+  onPageSizeChange?: (size: number) => void
+}
+
 interface PbDataTableProps<T> {
   data: T[]
   columns: PbColumnDef<T>[]
@@ -35,6 +43,9 @@ interface PbDataTableProps<T> {
   entityName?: string
   pageSize?: number
   loading?: boolean
+  showStatusFilter?: boolean
+  tableFixed?: boolean
+  serverPagination?: ServerPagination
 }
 
 export function PbDataTable<T>({
@@ -50,6 +61,9 @@ export function PbDataTable<T>({
   entityName = "registros",
   pageSize = 10,
   loading,
+  showStatusFilter = true,
+  tableFixed = false,
+  serverPagination,
 }: PbDataTableProps<T>) {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<StatusFilterValue>("all")
@@ -69,7 +83,9 @@ export function PbDataTable<T>({
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const safePage = Math.min(page, totalPages)
-  const paginated = filtered.slice((safePage - 1) * pageSize, safePage * pageSize)
+  const paginated = serverPagination
+    ? filtered
+    : filtered.slice((safePage - 1) * pageSize, safePage * pageSize)
 
   if (loading) {
     return (
@@ -95,7 +111,6 @@ export function PbDataTable<T>({
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <PbSearchInput
@@ -106,20 +121,20 @@ export function PbDataTable<T>({
               setPage(1)
             }}
           />
-          <PbStatusFilter
+          {showStatusFilter && <PbStatusFilter
             value={status}
             onChange={(v) => {
               setStatus(v)
               setPage(1)
             }}
-          />
+          />}
         </div>
         {actions}
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border bg-white">
-        <Table>
+      <div className="overflow-x-auto rounded-xl border bg-white">
+        <Table className={cn(tableFixed && "table-fixed w-full")}>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
               {columns.map((col) => (
@@ -167,13 +182,24 @@ export function PbDataTable<T>({
           </TableBody>
         </Table>
 
-        <PbPagination
-          page={safePage}
-          pageSize={pageSize}
-          total={filtered.length}
-          onPageChange={setPage}
-          entityName={entityName}
-        />
+        {serverPagination ? (
+          <PbPagination
+            page={serverPagination.page}
+            pageSize={serverPagination.pageSize}
+            total={serverPagination.total}
+            onPageChange={serverPagination.onPageChange}
+            onPageSizeChange={serverPagination.onPageSizeChange}
+            entityName={entityName}
+          />
+        ) : (
+          <PbPagination
+            page={safePage}
+            pageSize={pageSize}
+            total={filtered.length}
+            onPageChange={setPage}
+            entityName={entityName}
+          />
+        )}
       </div>
     </div>
   )

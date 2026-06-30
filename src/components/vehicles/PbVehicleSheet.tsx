@@ -1,6 +1,6 @@
 "use client"
 
-import type { MdfeVehicle } from "@/server/db/erp/schema/vehicle"
+import type { MdfeVehicle } from "@/server/db/schema/vehicle"
 import { PbDetailSheet, PbDetailSection, PbDetailField } from "@/components/shared/PbDetailSheet"
 import { PbAvatar } from "@/components/shared/PbAvatar"
 import { PbStatusBadge } from "@/components/shared/PbStatusBadge"
@@ -25,7 +25,6 @@ export function PbVehicleSheet({ vehicle, onClose }: PbVehicleSheetProps) {
     >
       {vehicle && (
         <>
-          {/* Profile header */}
           <div className="mb-6 flex flex-col items-center border-b border-border pb-5 text-center">
             <PbAvatar name={vehicle.plate} active={vehicle.active} size="lg" />
             <h3 className="mt-3 text-lg font-bold text-[#003062]">{vehicle.plate}</h3>
@@ -36,7 +35,6 @@ export function PbVehicleSheet({ vehicle, onClose }: PbVehicleSheetProps) {
           </div>
 
           <div className="space-y-6">
-            {/* Dados do Veículo */}
             <PbDetailSection title="Dados do Veículo">
               <div className="grid grid-cols-2 gap-3">
                 <PbDetailField label="RENAVAM" value={vehicle.registrationCode} />
@@ -48,7 +46,6 @@ export function PbVehicleSheet({ vehicle, onClose }: PbVehicleSheetProps) {
               </div>
             </PbDetailSection>
 
-            {/* Especificações */}
             <PbDetailSection title="Especificações">
               <div className="grid grid-cols-2 gap-3">
                 <PbDetailField label="Tipo Rodado" value={getWheelTypeLabel(vehicle.wheelType)} />
@@ -58,7 +55,6 @@ export function PbVehicleSheet({ vehicle, onClose }: PbVehicleSheetProps) {
               </div>
             </PbDetailSection>
 
-            {/* Fretefy */}
             <PbDetailSection title="Sincronização Fretefy" highlighted>
               <div className="flex items-center justify-between">
                 <div>
@@ -70,7 +66,6 @@ export function PbVehicleSheet({ vehicle, onClose }: PbVehicleSheetProps) {
               </div>
             </PbDetailSection>
 
-            {/* Observações */}
             {vehicle.notes && (
               <PbDetailSection title="Observações">
                 <p className="text-[11px] italic text-muted-foreground">{vehicle.notes}</p>

@@ -1,23 +1,23 @@
-import { getErpDb } from "@/server/db/erp"
-import { mdfeDrivers } from "@/server/db/erp/schema/driver"
+import { getDb } from "@/server/db"
+import { mdfeDrivers } from "@/server/db/schema/driver"
 import { eq } from "drizzle-orm"
-import { frtefyHttp } from "@/lib/PbFretefyLib"
+import { fretefyHttp } from "@/lib/PbFretefyLib"
 import type { FretefyDriver, FretefyDriverInput } from "@/types/PbFretefyType"
 
 export async function findActiveDrivers() {
-  const db = await getErpDb()
+  const db = await getDb()
   return db.select().from(mdfeDrivers).where(eq(mdfeDrivers.active, true))
 }
 
 export async function findAllDrivers() {
-  const db = await getErpDb()
+  const db = await getDb()
   return db.select().from(mdfeDrivers)
 }
 
 export async function getFretefyDriver(taxId: string): Promise<FretefyDriver> {
-  return frtefyHttp.get<FretefyDriver>(`/motorista/${taxId}`)
+  return fretefyHttp.get<FretefyDriver>(`/motorista/${taxId}`)
 }
 
 export async function createFretefyDriver(data: FretefyDriverInput): Promise<FretefyDriver> {
-  return frtefyHttp.post<FretefyDriver>("/motorista", data)
+  return fretefyHttp.post<FretefyDriver>("/motorista", {body: JSON.stringify(data)})
 }

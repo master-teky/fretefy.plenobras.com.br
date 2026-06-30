@@ -1,7 +1,7 @@
 services:
   dkron:
     image: dkron/dkron:light
-    restart: always
+    restart: no
     environment:
       - TZ=America/Sao_Paulo
     command: agent --server --bootstrap-expect=1
@@ -15,25 +15,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  mssql:
-    image: mcr.microsoft.com/azure-sql-edge:latest
-    restart: always
-    user: root
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=AppDb@Dev2024!
-      - TZ=America/Sao_Paulo
+  redis:
+    image: redis:7-alpine
+    container_name: plenobras-fretefy-redis
+    restart: no
     ports:
-      - "1436:1433"
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
-      - mssql_data:/var/opt/mssql
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'AppDb@Dev2024!' -Q 'SELECT 1' -b -o /dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      - redis_fretefy_data:/data
 
 volumes:
   mssql_data:
+  redis_fretefy_data:

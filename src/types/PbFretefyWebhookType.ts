@@ -39,17 +39,17 @@ const carrierSchema = z.object({
 }).passthrough()
 
 const driverSchema = z.object({
-  Id: z.string(),
-  Nome: z.string(),
-  Documento: z.string(),
+  Id: z.string().nullable(),
+  Nome: z.string().nullable(),
+  Documento: z.string().nullable(),
 }).passthrough()
 
 const vehicleSchema = z.object({
-  Id: z.string(),
-  Placa: z.object({ Numero: z.string() }).passthrough(),
+  Id: z.string().nullable(),
+  Placa: z.object({ Numero: z.string() }).passthrough().nullable(),
   Frota: z.string().nullable().optional(),
-  TipoVeiculoId: z.string(),
-  TipoCarroceriaId: z.string(),
+  TipoVeiculoId: z.string().nullable(),
+  TipoCarroceriaId: z.string().nullable(),
 }).passthrough()
 
 const documentSchema = z.object({
@@ -57,6 +57,8 @@ const documentSchema = z.object({
   Documento: z.string().nullable().optional(),
   NotaFiscal: z.string().nullable().optional(),
   Referencia: z.string().nullable().optional(),
+  Serie: z.string().nullable().optional(),
+  Numero: z.number().int().nullable().optional(),
 }).passthrough()
 
 const formationSchema = z.object({
@@ -74,7 +76,7 @@ export const fretefyWebhookPayloadSchema = z.object({
     RotaId: z.string().optional(),
     CodigoEDI: z.string().nullable().optional(),
     TipoEvento: z.number().int().optional(),
-    TipoAcaoEvento: z.number().int().optional(),
+    TipoAcaoEvento: z.number().int().optional().nullable(),
     TarefaId: z.string().nullable().optional(),
     Descricao: z.string().optional(),
     DhEvento: z.string().optional(),
@@ -85,9 +87,8 @@ export const fretefyWebhookPayloadSchema = z.object({
     Localidade: localitySchema.optional(),
     Anexo: attachmentSchema.nullable().optional(),
     Anexos: z.array(attachmentSchema).optional(),
-    Pedidos: z.array(z.string()).optional(),
+    Pedidos: z.array(z.unknown()).optional(),
     Referencias: z.array(z.unknown()).optional(),
-
     DhAlocacao: z.string().optional(),
     Transportador: carrierSchema.optional(),
     Veiculo: vehicleSchema.optional(),

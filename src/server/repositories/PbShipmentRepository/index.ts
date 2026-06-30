@@ -1,8 +1,8 @@
-import { frtefyHttp } from "@/lib/PbFretefyLib"
+import { fretefyHttp } from "@/lib/PbFretefyLib"
 import type { FretefyShipment, FretefyTrackingItem, FretefyType } from "@/types/PbFretefyType"
 
 export async function getShipment(id: string): Promise<FretefyShipment> {
-  return frtefyHttp.get<FretefyShipment>(`/carga/${id}`)
+  return fretefyHttp.get<FretefyShipment>(`/carga/${id}`)
 }
 
 export async function listShipments(params?: {
@@ -11,11 +11,11 @@ export async function listShipments(params?: {
   dhReferenciaFim?: string
 }): Promise<FretefyShipment[]> {
   const searchParams = new URLSearchParams()
-  if (params?.situacao !== undefined) searchParams.set("situacao", String(params.situacao))
+  if (params?.situacao !== undefined) searchParams.set("situacaoOfertaCarga", String(params.situacao))
   if (params?.dhReferenciaInicio) searchParams.set("dhReferenciaInicio", params.dhReferenciaInicio)
   if (params?.dhReferenciaFim) searchParams.set("dhReferenciaFim", params.dhReferenciaFim)
   const qs = searchParams.toString()
-  return frtefyHttp.get<FretefyShipment[]>(`/carga${qs ? `?${qs}` : ""}`)
+  return fretefyHttp.get<FretefyShipment[]>(`/carga${qs ? `?${qs}` : ""}`)
 }
 
 export async function getTracking(params?: {
@@ -28,9 +28,9 @@ export async function getTracking(params?: {
   if (params?.numero) searchParams.set("numero", params.numero)
   if (params?.pedido) searchParams.set("pedido", params.pedido)
   const qs = searchParams.toString()
-  return frtefyHttp.get<FretefyTrackingItem[]>(`/tracking${qs ? `?${qs}` : ""}`)
+  return fretefyHttp.get<FretefyTrackingItem[]>(`/tracking${qs ? `?${qs}` : ""}`)
 }
 
 export async function getTypes(type: number): Promise<FretefyType[]> {
-  return frtefyHttp.get<FretefyType[]>(`/tipos/${type}`)
+  return fretefyHttp.get<FretefyType[]>(`/tipos/${type}`)
 }

@@ -1,31 +1,33 @@
-import { getErpDb } from "@/server/db/erp"
-import { mdfeVehicles } from "@/server/db/erp/schema/vehicle"
+import { getDb } from "@/server/db"
+import { mdfeVehicles } from "@/server/db/schema/vehicle"
 import { eq } from "drizzle-orm"
-import { frtefyHttp } from "@/lib/PbFretefyLib"
+import { fretefyHttp } from "@/lib/PbFretefyLib"
 import type { FretefyVehicle, FretefyVehicleInput, FretefyType } from "@/types/PbFretefyType"
 
 export async function findActiveVehicles() {
-  const db = await getErpDb()
+  const db = await getDb()
   return db.select().from(mdfeVehicles).where(eq(mdfeVehicles.active, true))
 }
 
 export async function findAllVehicles() {
-  const db = await getErpDb()
+  const db = await getDb()
   return db.select().from(mdfeVehicles)
 }
 
 export async function getFretefyVehicle(licensePlate: string): Promise<FretefyVehicle> {
-  return frtefyHttp.get<FretefyVehicle>(`/veiculo/${licensePlate}`)
+  return fretefyHttp.get<FretefyVehicle>(`/veiculo/${licensePlate}`)
 }
 
 export async function createFretefyVehicle(data: FretefyVehicleInput): Promise<FretefyVehicle> {
-  return frtefyHttp.post<FretefyVehicle>("/veiculo", data)
+  return fretefyHttp.post<FretefyVehicle>("/veiculo", {
+    body: JSON.stringify(data)
+  })
 }
 
 export async function getFretefyVehicleTypes(): Promise<FretefyType[]> {
-  return frtefyHttp.get<FretefyType[]>("/tipos/1")
+  return fretefyHttp.get<FretefyType[]>("/tipos/1")
 }
 
 export async function getFretefyBodyTypes(): Promise<FretefyType[]> {
-  return frtefyHttp.get<FretefyType[]>("/tipos/2")
+  return fretefyHttp.get<FretefyType[]>("/tipos/2")
 }

@@ -9,6 +9,8 @@ export default auth((req) => {
     "/api/webhooks",
     "/api/cron",
     "/api/health",
+    "/api/sync-fretefy-tracks",
+    "/api/cache-fretefy-types",
   ];
 
   const isPublic = publicPaths.some((path) => pathname.startsWith(path));

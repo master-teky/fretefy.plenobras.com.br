@@ -7,35 +7,36 @@ const optionalString = () =>
   z.preprocess(emptyToUndefined, z.string().min(1).optional());
 
 const optionalUrl = () =>
-  z.preprocess(emptyToUndefined, z.string().url().optional());
+  z.preprocess(emptyToUndefined, z.url().optional());
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  APP_BASE_URL: z.string().url(),
+  APP_BASE_URL: z.url(),
   NEXTAUTH_SECRET: z.string().min(1),
-  NEXTAUTH_URL: z.string().url(),
+  NEXTAUTH_URL: z.url(),
 
   // Auth
   AUTH_API_URL: z.string().min(1),
   AUTH_API_PORT: z.string().min(1),
 
-  // ERP Database (read-only)
-  ERP_DB_HOST: z.string().min(1),
-  ERP_DB_PORT: z.string().default("1433"),
-  ERP_DB_USER: z.string().min(1),
-  ERP_DB_PASSWORD: z.string().min(1),
-  ERP_DB_NAME: z.string().min(1),
-
-  // App Database (read-write) — Fase 1: desabilitado, preencher quando o servidor próprio for provisionado
-  APP_DB_HOST: optionalString(),
-  APP_DB_PORT: z.string().default("1436"),
-  APP_DB_USER: optionalString(),
-  APP_DB_PASSWORD: optionalString(),
-  APP_DB_NAME: optionalString(),
+  // Database (SQL Server)
+  DB_HOST: z.string().min(1),
+  DB_PORT: z.string().default("1433"),
+  DB_USER: z.string().min(1),
+  DB_PASSWORD: z.string().min(1),
+  DB_NAME: z.string().min(1),
 
   // Fretefy API
-  FRETEFY_API_URL: z.string().url(),
+  FRETEFY_API_URL: z.url(),
   FRETEFY_API_KEY: z.string().min(1),
+
+  // Dados da empresa (Plenobras)
+  PLENOBRAS_UNIDADE_NEGOCIO_ID: z.guid(),
+  PLENOBRAS_DOCUMENTO: z.string().min(1),
+  PLENOBRAS_RAZAO_SOCIAL: z.string().min(1),
+  PLENOBRAS_ENDERECO: z.string().min(1),
+  PLENOBRAS_CIDADE: z.string().min(1),
+  PLENOBRAS_UF: z.string().length(2),
 
   // Webhooks
   WEBHOOK_SECRET: z.string().min(1),
@@ -45,7 +46,19 @@ const envSchema = z.object({
   CRON_SECRET: optionalString(),
 
   // Sync schedule
-  SYNC_CRON: z.string().default("0 */6 * * *"),
+  SYNC_CRON: z.string().default("0 0 */6 * * *"),
+  SYNC_TRACKS_CRON: z.string().default("0 */2 * * * *"),
+  CACHE_FRETEFY_TYPES_CRON: z.string().default("0 0 5 * * *"),
+
+  // AWS S3
+  AWS_REGION: z.string().min(1),
+  S3_BUCKET_NAME: z.string().min(1),
+  AWS_ACCESS_KEY_ID: z.string().min(1),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1),
+
+  // REDIS
+  REDIS_HOST: z.string().min(1),
+  REDIS_PORT: z.coerce.number().default(6379)
 });
 
 export type Env = z.infer<typeof envSchema>;

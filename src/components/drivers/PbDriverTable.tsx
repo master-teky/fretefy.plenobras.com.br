@@ -1,14 +1,14 @@
 "use client"
 
-import { useCallback, useState, useTransition } from "react"
+import { useCallback, useState } from "react"
 import { RefreshCw } from "lucide-react"
-import type { MdfeDriver } from "@/server/db/erp/schema/driver"
+import type { MdfeDriver } from "@/server/db/schema/driver"
+import { trpc } from "@/lib/PbTrpcClient"
 import { PbDataTable, type PbColumnDef } from "@/components/shared/PbDataTable"
 import { PbAvatar } from "@/components/shared/PbAvatar"
 import { PbStatusBadge } from "@/components/shared/PbStatusBadge"
 import { Button } from "@/components/ui/button"
 import { PbDriverSheet } from "./PbDriverSheet"
-import { syncAllDriversAction } from "@/app/(dashboard)/drivers/actions"
 import { cn } from "@/lib/PbShadCnLib"
 
 function formatDate(date: Date | string | null | undefined): string {
@@ -65,13 +65,15 @@ const columns: PbColumnDef<MdfeDriver>[] = [
   },
 ]
 
-interface PbDriverTableProps {
-  data: MdfeDriver[]
-}
-
-export function PbDriverTable({ data }: PbDriverTableProps) {
+export function PbDriverTable() {
   const [selected, setSelected] = useState<MdfeDriver | null>(null)
-  const [syncing, startSync] = useTransition()
+  const utils = trpc.useUtils()
+
+  const { data: drivers = [] } = trpc.driver.list.useQuery()
+
+  const syncAll = trpc.driver.syncAll.useMutation({
+    onSuccess: () => utils.driver.list.invalidate(),
+  })
 
   const searchFn = useCallback((row: MdfeDriver, query: string) => {
     return (
@@ -83,16 +85,10 @@ export function PbDriverTable({ data }: PbDriverTableProps) {
 
   const statusFn = useCallback((row: MdfeDriver) => row.active, [])
 
-  const handleSync = () => {
-    startSync(async () => {
-      await syncAllDriversAction()
-    })
-  }
-
   return (
     <>
       <PbDataTable
-        data={data}
+        data={drivers}
         columns={columns}
         searchPlaceholder="Buscar por nome, CPF ou CNH..."
         searchFn={searchFn}
@@ -103,12 +99,12 @@ export function PbDriverTable({ data }: PbDriverTableProps) {
         entityName="motoristas"
         actions={
           <Button
-            onClick={handleSync}
-            disabled={syncing}
+            onClick={() => syncAll.mutate()}
+            disabled={syncAll.isPending}
             className="bg-[#ff4700] text-white hover:bg-[#ff4700]/90"
           >
-            <RefreshCw className={cn("size-4", syncing && "animate-spin")} />
-            {syncing ? "Sincronizando..." : "Sincronizar"}
+            <RefreshCw className={cn("size-4", syncAll.isPending && "animate-spin")} />
+            {syncAll.isPending ? "Sincronizando..." : "Sincronizar"}
           </Button>
         }
       />

@@ -1,6 +1,6 @@
 "use client"
 
-import type { MdfeDriver } from "@/server/db/erp/schema/driver"
+import type { MdfeDriver } from "@/server/db/schema/driver"
 import { PbDetailSheet, PbDetailSection, PbDetailField } from "@/components/shared/PbDetailSheet"
 import { PbAvatar } from "@/components/shared/PbAvatar"
 import { PbStatusBadge } from "@/components/shared/PbStatusBadge"

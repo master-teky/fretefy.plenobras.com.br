@@ -1,14 +1,14 @@
 "use client"
 
-import { useCallback, useState, useTransition } from "react"
+import { useCallback, useState } from "react"
 import { RefreshCw } from "lucide-react"
-import type { MdfeVehicle } from "@/server/db/erp/schema/vehicle"
+import type { MdfeVehicle } from "@/server/db/schema/vehicle"
+import { trpc } from "@/lib/PbTrpcClient"
 import { PbDataTable, type PbColumnDef } from "@/components/shared/PbDataTable"
 import { PbAvatar } from "@/components/shared/PbAvatar"
 import { PbStatusBadge } from "@/components/shared/PbStatusBadge"
 import { Button } from "@/components/ui/button"
 import { PbVehicleSheet } from "./PbVehicleSheet"
-import { syncAllVehiclesAction } from "@/app/(dashboard)/vehicles/actions"
 import { cn } from "@/lib/PbShadCnLib"
 
 const WHEEL_TYPE_LABELS: Record<string, string> = {
@@ -70,13 +70,15 @@ const columns: PbColumnDef<MdfeVehicle>[] = [
   },
 ]
 
-interface PbVehicleTableProps {
-  data: MdfeVehicle[]
-}
-
-export function PbVehicleTable({ data }: PbVehicleTableProps) {
+export function PbVehicleTable() {
   const [selected, setSelected] = useState<MdfeVehicle | null>(null)
-  const [syncing, startSync] = useTransition()
+  const utils = trpc.useUtils()
+
+  const { data: vehicles = [] } = trpc.vehicle.list.useQuery()
+
+  const syncAll = trpc.vehicle.syncAll.useMutation({
+    onSuccess: () => utils.vehicle.list.invalidate(),
+  })
 
   const searchFn = useCallback((row: MdfeVehicle, query: string) => {
     return (
@@ -89,16 +91,10 @@ export function PbVehicleTable({ data }: PbVehicleTableProps) {
 
   const statusFn = useCallback((row: MdfeVehicle) => row.active, [])
 
-  const handleSync = () => {
-    startSync(async () => {
-      await syncAllVehiclesAction()
-    })
-  }
-
   return (
     <>
       <PbDataTable
-        data={data}
+        data={vehicles}
         columns={columns}
         searchPlaceholder="Buscar por placa, marca ou modelo..."
         searchFn={searchFn}
@@ -109,12 +105,12 @@ export function PbVehicleTable({ data }: PbVehicleTableProps) {
         entityName="veículos"
         actions={
           <Button
-            onClick={handleSync}
-            disabled={syncing}
+            onClick={() => syncAll.mutate()}
+            disabled={syncAll.isPending}
             className="bg-[#ff4700] text-white hover:bg-[#ff4700]/90"
           >
-            <RefreshCw className={cn("size-4", syncing && "animate-spin")} />
-            {syncing ? "Sincronizando..." : "Sincronizar"}
+            <RefreshCw className={cn("size-4", syncAll.isPending && "animate-spin")} />
+            {syncAll.isPending ? "Sincronizando..." : "Sincronizar"}
           </Button>
         }
       />

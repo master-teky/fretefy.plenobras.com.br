@@ -1,37 +1,53 @@
 import { NextResponse } from "next/server"
 import { sql } from "drizzle-orm"
-import { getErpDb } from "@/server/db/erp"
+import { getDb } from "@/server/db"
+import { findFretefyTypes } from "@/server/repositories/PbFretefyTypeRepository"
+import { FretefyTypeCode } from "@/types/PbFretefyType"
 import { createLogger } from "@/lib/PbLoggerLib"
 
 const log = createLogger("health")
 
 export async function GET() {
-  const erp = await checkErpDatabase()
+  const [db, fretefy] = await Promise.all([checkDatabase(), checkFretefy()])
 
-  const status = erp.ok ? "ok" : "degraded"
-  const httpStatus = erp.ok ? 200 : 503
+  const allOk = db.ok && fretefy.ok
+  const status = allOk ? "ok" : "degraded"
+  const httpStatus = allOk ? 200 : 503
 
   return NextResponse.json(
     {
       status,
       timestamp: new Date().toISOString(),
       checks: {
-        erpDatabase: erp,
+        database: db,
+        fretefy,
       },
     },
     { status: httpStatus },
   )
 }
 
-async function checkErpDatabase(): Promise<{ ok: boolean; latencyMs?: number; error?: string }> {
+async function checkDatabase(): Promise<{ ok: boolean; latencyMs?: number; error?: string }> {
   const start = Date.now()
   try {
-    const db = await getErpDb()
+    const db = await getDb()
     await db.execute(sql`SELECT 1`)
     return { ok: true, latencyMs: Date.now() - start }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    log.error({ error: message }, "Falha no health check do banco ERP")
+    log.error({ error: message }, "Falha no health check do banco de dados")
+    return { ok: false, latencyMs: Date.now() - start, error: message }
+  }
+}
+
+async function checkFretefy(): Promise<{ ok: boolean; latencyMs?: number; error?: string }> {
+  const start = Date.now()
+  try {
+    await findFretefyTypes(FretefyTypeCode.TipoVeiculo)
+    return { ok: true, latencyMs: Date.now() - start }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    log.error({ error: message }, "Falha no health check do Fretefy")
     return { ok: false, latencyMs: Date.now() - start, error: message }
   }
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { PbTrpcProvider } from "@/components/providers/PbTrpcProvider";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -26,6 +28,11 @@ export default function RootLayout({
     lang="pt-BR"
     className={`${plusJakartaSans.variable} h-full antialiased`}
   >
-    <body className="min-h-full flex flex-col">{children}</body>
+    <body className="min-h-full flex flex-col">
+      <PbTrpcProvider>
+        {children}
+      </PbTrpcProvider>
+      <Toaster position="top-right" />
+    </body>
   </html>
 }

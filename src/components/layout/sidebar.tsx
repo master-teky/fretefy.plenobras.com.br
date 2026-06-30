@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import {
   Truck,
   User,
+  Package,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -18,6 +19,7 @@ import logoPlenobras from "../../../public/assets/images/logo-loja-plenobras-col
 const navItems = [
   { href: "/drivers", label: "Motoristas", icon: User },
   { href: "/vehicles", label: "Veículos", icon: Truck },
+  { href: "/cargo", label: "Cargas", icon: Package },
 ];
 
 export function Sidebar() {

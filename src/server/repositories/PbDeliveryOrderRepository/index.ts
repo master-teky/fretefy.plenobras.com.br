@@ -1,9 +1,9 @@
-import { getErpDb } from "@/server/db/erp"
-import { orders } from "@/server/db/erp/schema/order"
-import { orderItems } from "@/server/db/erp/schema/order-item"
-import { orderStatuses } from "@/server/db/erp/schema/order-status"
-import { customers } from "@/server/db/erp/schema/customer"
-import { municipalities } from "@/server/db/erp/schema/municipality"
+import { getDb } from "@/server/db"
+import { orders } from "@/server/db/schema/order"
+import { orderItems } from "@/server/db/schema/order-item"
+import { orderStatuses } from "@/server/db/schema/order-status"
+import { customers } from "@/server/db/schema/customer"
+import { municipalities } from "@/server/db/schema/municipality"
 import { eq, and, isNull, notInArray, inArray, sql } from "drizzle-orm"
 
 export interface DeliveryOrderRow {
@@ -37,7 +37,7 @@ export interface DeliveryOrder extends DeliveryOrderRow {
 }
 
 export async function findPendingDeliveryOrders(): Promise<DeliveryOrder[]> {
-  const db = await getErpDb()
+  const db = await getDb()
 
   // Orders with status 40 (ready to deliver), not finished, not priority 31/32
   // orderStatuses.orderId is varchar, orders.id is int — use sql cast for the join
