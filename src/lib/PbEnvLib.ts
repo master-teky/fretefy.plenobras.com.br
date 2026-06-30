@@ -65,9 +65,19 @@ export type Env = z.infer<typeof envSchema>;
 
 let _env: Env | undefined;
 
+// Skip validation during `next build` (page-data collection) or when explicitly
+// requested. Runtime secrets aren't present at build time; real validation runs
+// when the server actually handles a request.
+const shouldSkipValidation = () =>
+  process.env.SKIP_ENV_VALIDATION === "true" ||
+  process.env.SKIP_ENV_VALIDATION === "1" ||
+  process.env.NEXT_PHASE === "phase-production-build";
+
 export function getEnv(): Env {
   if (!_env) {
-    _env = envSchema.parse(process.env);
+    _env = shouldSkipValidation()
+      ? (process.env as unknown as Env)
+      : envSchema.parse(process.env);
   }
   return _env;
 }

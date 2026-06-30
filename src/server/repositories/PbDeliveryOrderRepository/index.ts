@@ -25,7 +25,7 @@ export interface DeliveryOrderItemRow {
   itemNumber: number
   productId: number
   unitOfMeasure: string
-  quantity: number | null
+  quantity: string | null
   unitPrice: number
   totalPrice: number
   weight: number | null

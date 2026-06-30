@@ -31,12 +31,9 @@ export async function syncFretefyTracks(): Promise<void> {
   }
 
   const today = new Date()
-  const todayStr = [
-    String(today.getFullYear()).slice(2),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("/")
-  const manifests = await findManifestsSince(todayStr)
+  today.setHours(0, 0, 0, 0)
+
+  const manifests = await findManifestsSince(today)
 
   if (manifests.length === 0) {
     log.info("Nenhuma entrega nova para sincronizar. Todos os dados já estão sincronizados.")

@@ -12,11 +12,14 @@ import { customers } from "@/server/db/schema/customer"
 import { fretefyStatusCarga } from "@/server/db/schema/fretefy-status-carga"
 import { eq, and, gt, sql, notExists } from "drizzle-orm"
 import type { ManifestRow } from "@/types/PbManifestType"
+import {createLogger} from "@/lib/PbLoggerLib";
 
-export async function findManifestsSince(date: string): Promise<ManifestRow[]> {
+const log = createLogger("PbManifestRepository")
+
+export async function findManifestsSince(since: Date): Promise<ManifestRow[]> {
   const db = await getDb()
 
-  const since = new Date(`20${date.replace(/\//g, "-")}`)
+  log.info(`Consultando cargas desde: ${since.toLocaleString("pt-BR")}`)
 
   return db
     .select({

@@ -23,7 +23,7 @@ const log = createLogger("database")
 
 const schema = { ...customer, ...driver, ...fretefyEvent, ...fretefyEventAttachment, ...fretefyStatusCarga, ...invoice, ...mdfe, ...mdfeControl, ...mdfeFiscalNotes, ...mdfeHistory, ...mdfeManifestVehicles, ...mdfeStatus, ...municipality, ...order, ...orderItem, ...orderStatus, ...vehicle }
 
-type DrizzleDb = ReturnType<typeof drizzle<typeof schema>>
+type DrizzleDb = ReturnType<typeof drizzle<typeof schema, sql.ConnectionPool>>
 
 let _db: DrizzleDb | undefined
 let poolInstance: sql.ConnectionPool | null = null
@@ -66,7 +66,7 @@ export async function getDb(): Promise<DrizzleDb> {
 
   const pool = await connectPromise
   if (!_db) {
-    _db = drizzle(pool, { schema })
+    _db = drizzle({ client: pool, schema })
   }
   return _db
 }

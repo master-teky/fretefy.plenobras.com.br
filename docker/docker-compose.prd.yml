@@ -12,7 +12,26 @@ services:
     volumes:
       - ../logs:/app/logs
     depends_on:
-      - dkron
+      dkron:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fretefy-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    container_name: fretefy_plenobras_redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_fretefy_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - fretefy-network
 
@@ -36,3 +55,6 @@ services:
 networks:
   fretefy-network:
     driver: bridge
+
+volumes:
+  redis_fretefy_data:
