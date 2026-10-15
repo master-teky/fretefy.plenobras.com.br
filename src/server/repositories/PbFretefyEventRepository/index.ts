@@ -38,15 +38,37 @@ export async function existsFretefyEvent(filter: FretefyEventFilter): Promise<bo
   return rows.length > 0
 }
 
-export async function existsFretefyEventByInvoice(
-  invoiceNumber: number,
-  series: string,
-): Promise<boolean> {
+const FRETEFY_EVENT_ID_REGEX = /^[0-9a-f-]{8,64}$/i
+
+/**
+ * Evento já gravado para a NF? A chave é NF + série + tipo + Id do evento na Fretefy (`data.Id`), que fica no JSON da
+ * coluna observacao (`"Id":"<uuid>"`, inclusive nos registros antigos). Assim a coleta, a entrega (com a foto do
+ * canhoto) e as ocorrências da mesma NF entram como eventos distintos, e só o reenvio do MESMO webhook é ignorado.
+ * Sem Id válido no payload, cai na regra anterior (um evento por NF + tipo).
+ */
+export async function existsFretefyEventForWebhook(params: {
+  invoiceNumber: number
+  series: string
+  eventType: number
+  fretefyEventId: string | null | undefined
+}): Promise<boolean> {
+  const { invoiceNumber, series, eventType, fretefyEventId } = params
+  if (!fretefyEventId || !FRETEFY_EVENT_ID_REGEX.test(fretefyEventId)) {
+    return existsFretefyEvent({ invoiceNumber, series, eventType })
+  }
+
   const db = await getDb()
   const rows = await db
     .select({ id: fretefyEvents.id })
     .from(fretefyEvents)
-    .where(and(eq(fretefyEvents.invoiceNumber, invoiceNumber), eq(fretefyEvents.series, series)))
+    .where(
+      and(
+        eq(fretefyEvents.invoiceNumber, invoiceNumber),
+        eq(fretefyEvents.series, series),
+        eq(fretefyEvents.eventType, eventType),
+        sql`${fretefyEvents.notes} LIKE ${`%"Id":"${fretefyEventId}"%`}`,
+      ),
+    )
   return rows.length > 0
 }
 

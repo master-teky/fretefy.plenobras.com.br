@@ -13,7 +13,7 @@ import cacheService from "@/server/services/PbCacheService"
 import {findInvoiceByNumber} from "@/server/repositories/PbInvoiceRepository"
 import {
     existsFretefyEvent,
-    existsFretefyEventByInvoice,
+    existsFretefyEventForWebhook,
     insertFretefyEvent,
 } from "@/server/repositories/PbFretefyEventRepository"
 import { insertFretefyEventAttachment } from "@/server/repositories/PbFretefyEventAttachmentRepository"
@@ -135,9 +135,12 @@ async function handleCargaEvento(
             continue
         }
 
-        const alreadyExists = await existsFretefyEvent({ invoiceNumber: invoice.invoiceNumber, series: invoice.series, eventType: eventCode })
+        // coleta e entrega chegam com o mesmo tipo: a chave inclui o Id do evento para não descartar a entrega (canhoto)
+        const alreadyExists = await existsFretefyEventForWebhook({
+            invoiceNumber: invoice.invoiceNumber, series: invoice.series, eventType: eventCode, fretefyEventId: data.Id,
+        })
         if (alreadyExists) {
-            log.info({shipmentId, rotaId, invoiceNumber, series: invoice.series}, "FretefyEvento já existente — pulando")
+            log.info({shipmentId, rotaId, invoiceNumber, series: invoice.series, fretefyEventId: data.Id}, "FretefyEvento já existente — pulando")
             continue
         }
 
@@ -309,11 +312,13 @@ async function recordFretefyEvent(payload: FretefyWebhookPayload): Promise<numbe
       continue
     }
 
-    const alreadyExists = await existsFretefyEventByInvoice(invoice.invoiceNumber, series)
+    const alreadyExists = await existsFretefyEventForWebhook({
+      invoiceNumber: invoice.invoiceNumber, series, eventType: eventCode, fretefyEventId: data.Id,
+    })
     if (alreadyExists) {
       log.info(
-        { eventType: type, invoiceNumber: invoice.invoiceNumber, series },
-        "FretefyEvento já existente para NumNF/Serie — pulando",
+        { eventType: type, invoiceNumber: invoice.invoiceNumber, series, fretefyEventId: data.Id },
+        "FretefyEvento já existente para NumNF/Serie/evento — pulando",
       )
       continue
     }
